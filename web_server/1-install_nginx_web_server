@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx on an Ubuntu server
+# Installs Nginx, updates the index page, and starts the service
 
-export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y nginx
 echo "Holberton School" > /var/www/html/index.html
-service nginx start
+service nginx restart
+sleep 2
