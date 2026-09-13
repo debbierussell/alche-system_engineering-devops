@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
-# Installs nginx and configures it to serve Holberton School
+# Installs nginx and configures it to serve a page with Holberton School
 
-sudo apt-get update -y
-sudo apt-get install -y nginx
-sudo service nginx start 2>/dev/null || sudo nginx || sudo /usr/sbin/nginx
-echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
-sudo service nginx reload 2>/dev/null || sudo nginx -s reload
-pgrep nginx >/dev/null || sudo nginx
+# Install nginx (ignore failures from policy-rc.d during apt)
+apt-get update -y
+apt-get install -y nginx
+
+# Make sure nothing stale is running, then start nginx directly
+pkill -x nginx || true
+sleep 1
+/usr/sbin/nginx
+
+# Serve the required page
+echo "Holberton School" > /var/www/html/index.html
+
+# Give nginx a moment and verify it's actually listening on port 80
+sleep 1
+/usr/sbin/nginx -t
+pgrep -x nginx >/dev/null || /usr/sbin/nginx
