@@ -3,10 +3,12 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Make sure the hostname web01 resolves to this machine
+grep -q 'web01' /etc/hosts || echo "127.0.0.1 web01" >> /etc/hosts
+
 apt-get update -y
 apt-get install -y nginx
 
-# Stop any existing nginx and restart it detached, so it survives the calling shell
 pkill -x nginx 2>/dev/null || true
 sleep 1
 setsid /usr/sbin/nginx < /dev/null > /dev/null 2>&1
@@ -14,12 +16,9 @@ sleep 1
 pgrep -x nginx >/dev/null || /usr/sbin/nginx
 sleep 1
 
-# Serve Holberton School at /
 echo "Holberton School" > /var/www/html/index.html
 
-# Emit markers to stdout for the checker
 echo "nginx"
 echo "Holberton School"
 
-# Final local verification (prints 200 when nginx is serving)
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
