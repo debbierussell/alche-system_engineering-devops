@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Installs nginx and configures it to serve a page with Holberton School
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ "$(id -u)" -eq 0 ]; then SUDO=""; else SUDO="sudo"; fi
 
 $SUDO apt-get update -y
@@ -8,13 +10,18 @@ $SUDO apt-get install -y nginx
 
 echo "Holberton School" | $SUDO tee /var/www/html/index.html > /dev/null
 
+$SUDO systemctl enable nginx 2>/dev/null || true
 $SUDO systemctl restart nginx 2>/dev/null \
   || $SUDO service nginx restart 2>/dev/null \
   || $SUDO nginx \
   || true
 
-sleep 2
+for i in $(seq 1 30); do
+    code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/ || true)
+    [ "$code" = "200" ] && break
+    sleep 1
+done
 
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
 echo "nginx"
 echo "Holberton School"
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
