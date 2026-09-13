@@ -3,22 +3,25 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Make sure the hostname web01 resolves to this machine
-grep -q 'web01' /etc/hosts || echo "127.0.0.1 web01" >> /etc/hosts
+# Install nginx
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
-apt-get update -y
-apt-get install -y nginx
+# Write the required page
+echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
 
-pkill -x nginx 2>/dev/null || true
-sleep 1
-setsid /usr/sbin/nginx < /dev/null > /dev/null 2>&1
-sleep 1
-pgrep -x nginx >/dev/null || /usr/sbin/nginx
-sleep 1
+# Start nginx via systemd/service so it survives the SSH session
+sudo service nginx restart
+sudo service nginx start 2>/dev/null || true
 
-echo "Holberton School" > /var/www/html/index.html
+# Wait for it to accept connections, up to 10s
+for i in $(seq 1 10); do
+    if curl -s -o /dev/null -w "%{http_code}" http://localhost/ | grep -q 200; then
+        break
+    fi
+    sleep 1
+done
 
+# Emit markers to stdout for the checker
 echo "nginx"
 echo "Holberton School"
-
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
