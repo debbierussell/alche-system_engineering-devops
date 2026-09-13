@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # A Bash script that installs and configures Nginx on an Ubuntu server
 
-export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y nginx
-echo "Holberton School" > /var/www/html/index.html
+echo "Hello World!" > /var/www/html/index.html
 service nginx start
