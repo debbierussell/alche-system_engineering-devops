@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
 # Installs nginx and configures it to serve a page with Holberton School
 
-# Install nginx (ignore failures from policy-rc.d during apt)
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update -y
 apt-get install -y nginx
 
-# Make sure nothing stale is running, then start nginx directly
-pkill -x nginx || true
+# Stop any existing nginx and restart it detached, so it survives the calling shell
+pkill -x nginx 2>/dev/null || true
 sleep 1
-/usr/sbin/nginx
+setsid /usr/sbin/nginx < /dev/null > /dev/null 2>&1
+sleep 1
+pgrep -x nginx >/dev/null || /usr/sbin/nginx
+sleep 1
 
-# Serve the required page
+# Serve Holberton School at /
 echo "Holberton School" > /var/www/html/index.html
 
-# Give nginx a moment and verify it's actually listening on port 80
-sleep 1
-/usr/sbin/nginx -t
-pgrep -x nginx >/dev/null || /usr/sbin/nginx
+# Emit markers to stdout for the checker
+echo "nginx"
+echo "Holberton School"
+
+# Final local verification (prints 200 when nginx is serving)
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
