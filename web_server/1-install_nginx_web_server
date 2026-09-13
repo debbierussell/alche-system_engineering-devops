@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Installs Nginx, updates the index page, and starts the service
+# Installs Nginx and configures the root page to display Holberton School
 
 apt-get update -y
 apt-get install -y nginx
+rm -f /var/www/html/index.nginx-debian.html
 echo "Holberton School" > /var/www/html/index.html
+chmod 644 /var/www/html/index.html
 service nginx restart
-sleep 2
